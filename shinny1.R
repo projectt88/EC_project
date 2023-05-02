@@ -26,7 +26,41 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                            tabPanel("Welcome",
                                     titlePanel("About the study"), 
                                     div(includeMarkdown("https://github.com/EFPTTT-THYROID/Shiniapp/raw/main/about.md"))),
-                           tabPanel("Multi-Prediction",
+                           tabPanel("Single case Prediction",
+                                    
+                                    # Input values
+                                    sidebarPanel(
+                                      HTML("<h3>Input parameters</h3>"),
+                                      # give name
+                                      textInput("txt", "Given Full Name:", ""), # txt: input
+                                      # give age 
+                                      numericInput("age", "Age:", ""), # age
+                                      # give sex 
+                                      selectInput("sex", label = "Sex:", 
+                                                  choices = list("Male" = "Male", "Female" = "Female"), 
+                                                  selected = "TRUE"), # sex 
+                                      #Give type of samples 
+                                      selectInput("type ", label = "Type of samples:", 
+                                                  choices = list("Tissue" = "Tissues", "Blood" = "Blood"), 
+                                                  selected = "Tissue"),
+                                      # input file 
+                                      fileInput("file1", "Choose CSV File", accept = ".csv"),
+                                      checkboxInput("header", "Header", TRUE),
+                                      
+                                      actionButton("submitbutton1", "Run Analysis", class = "btn btn-primary")
+                                    ),
+                                    
+                                    mainPanel(
+                                      tags$label(h1('Result')), # Status/Output Text Box
+                                      p("These results are for reference only", style = "font-family: 'times'; font-si16pt"),
+                                      verbatimTextOutput('contents1'),
+                                      verbatimTextOutput('contents2'),
+                                      verbatimTextOutput('contents3'),
+                                      tableOutput("contents4"), # Prediction results table
+                                      plotlyOutput('plot', height = "300px", width = "800px")
+                                    )
+                           ),
+                           tabPanel("Multicases Prediction",
                                     # Input values
                                     sidebarPanel(
                                       HTML("<h3>Input parameters</h3>"),
@@ -66,6 +100,52 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
 
 
 server <- function(input, output) {
+  
+  observeEvent(input$submitbutton1, {
+    ##### Personal Prediction
+    # output with names 
+    output$contents1 <- renderText({input$txt})
+    # output with age
+    output$contents2 <- renderText({input$age})
+    # out out with sex
+    output$contents3 <- renderText({input$sex})
+    # output file 
+    output$contents4 <- renderTable({
+      file <- input$file1
+      ext <- tools::file_ext(file$datapath)
+      req(file)
+      validate(need(ext == "csv", "Please upload a csv file"))
+      test <-as.data.frame(fread(file$datapath, header = input$header))
+      #input model: 
+      source("https://raw.githubusercontent.com/projectt88/EC_project/main/model.R")
+      #output 
+      Output <-data.frame(Prediction=predict(model,test) ,t(data.frame(Pro=round(predict(model,test,type="prob"), 3))))
+      rownames(Output) <- NULL
+      print(Output)})
+    # output graph 
+    output$plot <- renderPlotly({
+      file <- input$file1
+      ext <- tools::file_ext(file$datapath)
+      req(file)
+      validate(need(ext == "csv", "Please upload a csv file"))
+      test <-as.data.frame(fread(file$datapath, header = input$header))
+      #input model:
+      source("https://raw.githubusercontent.com/projectt88/EC_project/main/model.R")
+      #output 
+      Output <-data.frame(Prediction=predict(model,test), Prob=round(predict(model,test,type="prob"), 3))
+      Output$Subtye <- rownames(Output)
+      data = as.data.frame(melt(Output))[-3]
+      colnames(data) = c("Prediction", "Subtypes", "Probability")
+      colnames(data) = c("Prediction", "Subtypes", "Probability")
+      plot_ly(
+        data = data,
+        x = ~ Subtypes,
+        y = ~ Probability,
+        type = 'bar',
+        color = ~ Subtypes
+      )
+    })
+  })
   
   ### multi-prediction 
   observeEvent(input$submitbutton2, {
