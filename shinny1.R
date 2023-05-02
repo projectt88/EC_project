@@ -107,9 +107,9 @@ server <- function(input, output) {
             testdata <- testdata()
             req(input$file2)
       # creat model
-      setwd("/media/hoangnguyen/d1t/data/Document/Shinyapp_EC")
+      #setwd("/media/hoangnguyen/d1t/data/Document/Shinyapp_EC")
       ## create model
-      source("model.R")
+      source("https://raw.githubusercontent.com/projectt88/EC_project/main/model.R")
       # Predict and make data.table
       Predict <- round(as.data.frame(predict(model, testdata, type="prob")),4)
       Predict$Prediction <- names(Predict)[1:4][apply(Predict[,1:4], 1, which.max)]

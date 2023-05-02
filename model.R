@@ -8,7 +8,7 @@ formula = y ~ cg25837710 + cg11224603 + cg19651132 + cg06633615 + cg07616879 +
   cg06108510 + cg20392607 + cg09493063
 
 
-res_data = read_csv("resampled_data.csv")
+res_data = read_csv("https://raw.githubusercontent.com/projectt88/EC_project/main/resampled_data.csv")
 beta = res_data[,!colnames(res_data) %in% c("...1", "subtype")]
 model_CpG = colnames(beta) # call selected CpG for later uses
 y = res_data$subtype # call ground-truth classes
