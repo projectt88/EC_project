@@ -2,6 +2,7 @@
 library(shiny)
 library(shinythemes)
 library(RCurl)
+library(curl)
 library(plotly)
 library(shinydashboard)
 library(data.table)
@@ -18,14 +19,12 @@ library(readr)
 library(tidyr)
 library(dplyr)
 library(DT)
+library(httr)    
 
 
 ui <- fluidPage(theme = shinytheme("spacelab"),
                 
                 navbarPage("UCEC Prediction",
-                           tabPanel("Welcome",
-                                    titlePanel("About the study"), 
-                                    div(includeMarkdown("https://github.com/EFPTTT-THYROID/Shiniapp/raw/main/about.md"))),
                            tabPanel("Single case Prediction",
                                     
                                     # Input values
@@ -35,10 +34,6 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                                       textInput("txt", "Given Full Name:", ""), # txt: input
                                       # give age 
                                       numericInput("age", "Age:", ""), # age
-                                      # give sex 
-                                      selectInput("sex", label = "Sex:", 
-                                                  choices = list("Male" = "Male", "Female" = "Female"), 
-                                                  selected = "TRUE"), # sex 
                                       #Give type of samples 
                                       selectInput("type ", label = "Type of samples:", 
                                                   choices = list("Tissue" = "Tissues", "Blood" = "Blood"), 
@@ -90,12 +85,8 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                                         box(height = 500, width = 500,
                                             DT::dataTableOutput("table")
                                         ))
-                                    )),
-                           tabPanel("About", 
-                                    titlePanel("About the study"), 
-                                    div(includeMarkdown("https://github.com/EFPTTT-THYROID/Shiniapp/raw/main/about.md"), align="justify"),
-                                    uiOutput("image1")
-                           )
+                                    ))
+                         
                 ))
 
 
@@ -107,8 +98,6 @@ server <- function(input, output) {
     output$contents1 <- renderText({input$txt})
     # output with age
     output$contents2 <- renderText({input$age})
-    # out out with sex
-    output$contents3 <- renderText({input$sex})
     # output file 
     output$contents4 <- renderTable({
       file <- input$file1

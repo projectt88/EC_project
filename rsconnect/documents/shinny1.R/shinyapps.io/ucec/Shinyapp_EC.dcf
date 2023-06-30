@@ -5,10 +5,10 @@ account: ucec
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 9008189
-bundleId: 7163473
+bundleId: 7167509
 url: https://ucec.shinyapps.io/Shinyapp_EC/
-when: 1683031317.75166
-lastSyncTime: 1683031317.7517
+when: 1683096973.12653
+lastSyncTime: 1683096973.12656
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: .vscode/settings.json|model_uses.R|model.R|resampled_data.csv|service.R|shiny.R|test.csv|train.csv
+ignoredFiles: .vscode/settings.json|model_uses.R|model.R|resampled_data.csv|service.R|shiny.R|test_persional.csv|test.csv|train.csv
